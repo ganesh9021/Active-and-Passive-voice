@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import XMLParser from "react-xml-parser";
 
 import { Button } from "@mui/material";
-import { Dropdown } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -28,7 +28,6 @@ import { useTheme } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 
-import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
@@ -48,8 +47,11 @@ import nounverbjson from "../supportingfiles/DBJSON/noun_verb.json";
 import nounjson from "../supportingfiles/DBJSON/noun.json";
 import passActFeedbackProps from "../supportingfiles/languageProperties/passiveActive/en-IN-feedbackproperties.json";
 import actpassFeedbackProps from "../supportingfiles/languageProperties/activePassive/en-IN-feedbackproperties.json";
+import { useTranslation } from "react-i18next";
 
 const MidLevelActivePassivePage = () => {
+  const [level, setLevel] = useState("Level 1");
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
@@ -209,91 +211,80 @@ const MidLevelActivePassivePage = () => {
   }, [actvityId]);
 
   async function simpleSentenceParser(xmlFileSrc) {
-    const path = "../supportingfiles" + xmlFileSrc;
-    var staticPath = require(`../supportingfiles${xmlFileSrc}`);
-    const response = fetch(staticPath);
+    try {
+      const path = "../supportingfiles" + xmlFileSrc;
+      const staticPath = require(`../supportingfiles${xmlFileSrc}`);
 
-    fetch(staticPath)
-      .then((response) => response.text())
-      .then((textResponse) => {
-        var parser = new DOMParser();
-        var xmlDoc = parser.parseFromString(textResponse, "text/xml");
-        const listSentence = xmlDoc.querySelectorAll("sentence");
-        var randSentId = randomNumberInRange(0, listSentence.length - 1);
-        var node = listSentence[randSentId];
-        var nodeId = node.getAttribute("id");
-        var nodeType = node.getAttribute("type");
-        var nodeChild = node.childNodes;
-        var nodeSubject = node.querySelectorAll("subject");
-        var nodePredicate = node.querySelectorAll("predicate");
-        var nodeSubjNounType = nodeSubject[0]
-          .querySelectorAll("noun")[0]
-          .getAttribute("type");
-        var nodePredVerbCate = nodePredicate[0]
-          .querySelectorAll("verb")[0]
-          .getAttribute("category");
-        var nodePredVerbInfitype = nodePredicate[0]
-          .querySelectorAll("verb")[0]
-          .querySelectorAll("infinitive")[0]
-          .getAttribute("type");
-        var nodePredVerbInfiTense = nodePredicate[0]
-          .querySelectorAll("verb")[0]
-          .querySelectorAll("infinitive")[0]
-          .getAttribute("tense");
-        var nodePredVerbInfiSubVerbType = nodePredicate[0]
-          .querySelectorAll("verb")[0]
-          .querySelectorAll("infinitive")[0]
-          .querySelectorAll("subverb")[0]
-          .getAttribute("type");
-        var nodePredObjNounType = nodePredicate[0]
-          .querySelectorAll("object")[0]
-          .querySelectorAll("noun")[0]
-          .getAttribute("type");
-        var nodeSubjArtType = nodeSubject[0]
-          .querySelectorAll("article")[0]
-          .getAttribute("type");
-        var nodePredObjArtType = nodePredicate[0]
-          .querySelectorAll("object")[0]
-          .querySelectorAll("article")[0]
-          .getAttribute("type");
+      const response = await fetch(staticPath);
+      const textResponse = await response.text();
 
-        setTemplatePojo({
-          ...TemplatePojo,
-          sentenceID: nodeId,
-          sentenceType: nodeType,
-          subjectType: nodeSubjNounType,
-          verbCategory: nodePredVerbCate,
-          infinitiveType: nodePredVerbInfitype,
-          infinitiveTense: nodePredVerbInfiTense,
-          subverbType: nodePredVerbInfiSubVerbType,
-          objectType: nodePredObjNounType,
-          subjectArticleType: nodeSubjArtType,
-          objectArticleType: nodePredObjArtType,
-        });
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(textResponse, "text/xml");
+      const listSentence = xmlDoc.querySelectorAll("sentence");
 
-        tempPojoSent = {
-          ...tempPojoSent,
-          sentenceID: nodeId,
-          sentenceType: nodeType,
-          subjectType: nodeSubjNounType,
-          verbCategory: nodePredVerbCate,
-          infinitiveType: nodePredVerbInfitype,
-          infinitiveTense: nodePredVerbInfiTense,
-          subverbType: nodePredVerbInfiSubVerbType,
-          objectType: nodePredObjNounType,
-          subjectArticleType: nodeSubjArtType,
-          objectArticleType: nodePredObjArtType,
-        };
-      })
-      .catch((error) => {
-        console.log(error);
+      const randSentId = randomNumberInRange(0, listSentence.length - 1);
+      const node = listSentence[randSentId];
+      const nodeId = node.getAttribute("id");
+      const nodeType = node.getAttribute("type");
+
+      const nodeSubject = node.querySelectorAll("subject");
+      const nodePredicate = node.querySelectorAll("predicate");
+
+      const nodeSubjNounType = nodeSubject[0]
+        .querySelectorAll("noun")[0]
+        .getAttribute("type");
+
+      const verbNode = nodePredicate[0].querySelectorAll("verb")[0];
+      const nodePredVerbCate = verbNode.getAttribute("category");
+
+      const infinitiveNode = verbNode.querySelectorAll("infinitive")[0];
+      const nodePredVerbInfitype = infinitiveNode.getAttribute("type");
+      const nodePredVerbInfiTense = infinitiveNode.getAttribute("tense");
+
+      const subverbNode = infinitiveNode.querySelectorAll("subverb")[0];
+      const nodePredVerbInfiSubVerbType = subverbNode.getAttribute("type");
+
+      const objectNode = nodePredicate[0].querySelectorAll("object")[0];
+      const nodePredObjNounType = objectNode
+        .querySelectorAll("noun")[0]
+        .getAttribute("type");
+
+      const nodeSubjArtType = nodeSubject[0]
+        .querySelectorAll("article")[0]
+        .getAttribute("type");
+
+      const nodePredObjArtType = objectNode
+        .querySelectorAll("article")[0]
+        .getAttribute("type");
+
+      const parsedData = {
+        sentenceID: nodeId,
+        sentenceType: nodeType,
+        subjectType: nodeSubjNounType,
+        verbCategory: nodePredVerbCate,
+        infinitiveType: nodePredVerbInfitype,
+        infinitiveTense: nodePredVerbInfiTense,
+        subverbType: nodePredVerbInfiSubVerbType,
+        objectType: nodePredObjNounType,
+        subjectArticleType: nodeSubjArtType,
+        objectArticleType: nodePredObjArtType,
+      };
+
+      setTemplatePojo({
+        ...TemplatePojo,
+        ...parsedData,
       });
 
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve(tempPojoSent);
-      }, 600);
-    });
+      tempPojoSent = {
+        ...tempPojoSent,
+        ...parsedData,
+      };
+
+      return parsedData;
+    } catch (error) {
+      console.error("Error in simpleSentenceParser:", error);
+      return null; // or throw error if you want the caller to handle it
+    }
   }
 
   const randomNumberInRange = (min, max) => {
@@ -1549,7 +1540,7 @@ const MidLevelActivePassivePage = () => {
           element.setAttribute("class", "ui-state-default");
           element.setAttribute(
             "style",
-            "margin: 0px 3px 3px; padding: 0 6px; font-size: 1.4em; font-family: arial; font-weight: bold;"
+            "margin: 0px 0px 0px; padding: 0 2px; font-family: arial; font-weight: bold;"
           );
           element.textContent = activeVoiceWord;
           rootElement.appendChild(element);
@@ -1560,7 +1551,7 @@ const MidLevelActivePassivePage = () => {
           element.setAttribute("class", "ui-state-default");
           element.setAttribute(
             "style",
-            "margin: 0px 3px 3px; padding: 0 6px; font-size: 1.4em; font-family: arial; font-weight: bold;"
+            "margin: 0px 0px 0px; padding: 0 2px; font-family: arial; font-weight: bold;"
           );
           element.textContent = activeVoiceWord;
           rootElement.appendChild(element);
@@ -1588,10 +1579,10 @@ const MidLevelActivePassivePage = () => {
           element.setAttribute("class", "ui-state-default");
           element.setAttribute(
             "style",
-            "margin: 0px 3px 3px; padding: 0 6px; font-size: 1.4em; font-family: arial; font-weight: bold;"
+            "margin: 0px 0px 0px; padding: 0 2px; font-family: arial; font-weight: bold;"
           );
           element.textContent = passiveVoiceWord;
-          rootElement.appendChild(element);
+          // rootElement.appendChild(element);
         } else {
           const rootElement = document.getElementById("sortable1");
           const element = document.createElement("li");
@@ -1599,7 +1590,7 @@ const MidLevelActivePassivePage = () => {
           element.setAttribute("class", "ui-state-default");
           element.setAttribute(
             "style",
-            "margin: 0px 3px 3px; padding: 0 6px; font-size: 1.4em; font-family: arial; font-weight: bold;"
+            "margin: 0px 0px 0px; padding: 0 2px; font-family: arial; font-weight: bold;"
           );
           element.textContent = passiveVoiceWord;
           rootElement.appendChild(element);
@@ -1927,372 +1918,218 @@ const MidLevelActivePassivePage = () => {
     }
   };
 
-  const handlePassiveActive = (e) => {
-    navigate("/launchpage/passive-active", { state: { activityId: 1 } });
-  };
-
-  const handleActivePassive = (e) => {
-    navigate("/launchpage/active-passive", { state: { activityId: 3 } });
+  const handleLevelChange = (event) => {
+    setLevel(event.target.value);
+    switch (event.target.value) {
+      case "Level 1":
+        navigate("/launchpage/active-passive", { state: { activityId: 3 } });
+        break;
+      case "Level 2":
+        navigate("/launchpage/passive-active", { state: { activityId: 1 } });
+        break;
+      default:
+        console.log("Bad choice!");
+        break;
+    }
   };
 
   return (
     <div
-      className="row-md-auto"
+      className="row d-flex"
       style={{
-        height: "100%",
-        width: "100%",
-        borderRadius: "20px",
-        background: "#F2FBFF",
+        width: "100vw",
+        backgroundColor: "#F2FBFF",
+        borderRadius: "14px",
+        opacity: 1,
+        boxShadow: "0px 10px 5px rgba(0, 0, 0, 0.40)",
+        display: "block",
+        overflow: "auto",
       }}
     >
-      <div
-        className="row-md-auto"
-        style={{ height: "100%", width: "100%", borderRadius: "20px" }}
-      >
-        {/* =============================== Start of Header ================================= */}
-        <div className="row-md-auto d-flex " style={{ height: "8%" }}>
-          <div
-            className=""
-            style={{ width: "20%", display: "flex", textAlign: "center" }}
-          >
-            <div style={{ width: "40%" }}></div>
-            <h6
-              className=""
-              style={{
-                backgroundColor: "rgb(245, 211, 139)",
-                height: "70%",
-                borderRadius: "0 0 10px 10px",
-                width: "70%",
-                paddingTop: "2%",
-                marginLeft: "1vh",
-                color: "#220730",
-              }}
-            >
-              <strong style={{ fontSize: "1.2rem" }}>
-                {" "}
-                {actvityId === 1 ? <>Level 2</> : <>Level 1</>}
-              </strong>
-            </h6>
-          </div>
-
-          <div className="col text-center">
-            <h5 style={{ paddingTop: "10px", color: "white" }}>
-              <strong> </strong>
-            </h5>
-          </div>
-
-          <div
-            className="col-md-auto"
-            style={{
-              width: "30%",
-              display: "flex",
-              margin: "auto",
-              textAlign: "center",
-              alignContent: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Dropdown
-              className="d-flex justify-content-end"
-              style={{ height: "90%" }}
-              variant="secondary"
-            >
-              <Dropdown.Toggle
-                style={{ backgroundColor: "#1976d2", fontSize: "0.95rem" }}
-                id="dropdown-basic"
-              >
-                {" "}
-                SELECT LEVEL{" "}
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu style={{ background: "#F7F1FC" }}>
-                <Dropdown.Item
-                  //href="#/launchpage/active-passive"
-                  style={{ color: "#350B5B" }}
-                  onClick={(e) => handleActivePassive(e)}
-                >
-                  Level 1
-                </Dropdown.Item>
-
-                <Dropdown.Item
-                  //href="#/launchpage/passive-active"
-                  style={{ color: "#350B5B" }}
-                  onClick={(e) => handlePassiveActive(e)}
-                >
-                  Level 2
-                </Dropdown.Item>
-
-                {/* <Dropdown.Item href="#/launchpage/select-letter" style={{ color: "#350B5B" }} >
-                               Level 3
-                          </Dropdown.Item> */}
-              </Dropdown.Menu>
-            </Dropdown>
-          </div>
-        </div>
-        {/* =============================== End of Header ================================= */}
-
-        {/* =============================== Start of Letter ================================= */}
+      <div className="col-sm-9 d-flex align-items-center justify-content-center">
         <div
-          className="col justify-content-around"
           style={{
-            // border: "1px solid #A7A8AB",
-            //height: "90%",
-            height: "77vh",
-            marginLeft: "0.1%",
-            marginRight: "0.1%",
-            // backgroundColor: "#E4CDFF",
-            //paddingLeft: "1%",
-            //paddingTop: "1%",
-            //fontSize: "2.2vh",
-            borderRadius: "5px",
-            //border: "1px solid #BAB7BD",
-            width: "100%",
-            display: "flex",
-            //position: "relative",
+            height: "80vh",
+            width: "95%",
+            background: "#FFFFFF 0% 0% no-repeat padding-box",
+            borderRadius: "13px",
+            boxShadow: "0px 4px 7px #00000029",
+            display: "block",
+            padding: "4%",
+            paddingTop: "0%",
+            overflow: "auto",
+            overflowX: "hidden",
+            margin: "5px",
+            fontSize: "calc(.6rem + .4vw)",
           }}
         >
-          {/* ============================================================================== */}
+          <div className="row align-items-center mb-5 mt-2">
+            <div className="col-12 col-md-6 d-flex justify-content-end mb-2 mb-md-0">
+              <div
+                className="fw-bolder"
+                style={{ fontSize: "calc(1rem + .4vw)" }}
+              >
+                Active to passive
+              </div>
+            </div>
 
-          <div
-            className="row"
-            style={{
-              // border: "1px solid #A7A8AB",
-              height: "100%",
-              marginLeft: "0.1%",
-              marginRight: "0.1%",
-              // backgroundColor: "#E4CDFF",
-              paddingLeft: "1%",
-              paddingTop: "1%",
-              fontSize: "2.2vh",
-              borderRadius: "13px",
-              boxShadow: "0px 4px 7px #00000029",
-              width: "67%",
-              backgroundColor: "#FFFFFF",
-            }}
-          >
+            <div className="col-12 col-md-6 d-flex justify-content-md-end justify-content-center">
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <Select
+                  labelId="demo-simple-select-label"
+                  label="Select Adverb"
+                  id="demo-simple-select"
+                  value={level}
+                  onChange={handleLevelChange}
+                  sx={{
+                    bgcolor: "green",
+                    borderRadius: "8px",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "green",
+                    },
+                    color: "white",
+                    fontSize: "calc(.6rem + .4vw)",
+                  }}
+                >
+                  <MenuItem value="Level 1">{t("level1")}</MenuItem>
+                  <MenuItem value="Level 2">{t("level2")}</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+          </div>
+
+          <div style={{ width: "100%", height: "auto" }}>
             <div
-              className="row-md-auto overflow-auto"
               style={{
-                fontSize: "1.8vh",
-                height: "90%",
                 textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
                 justifyContent: "center",
-                alignContent: "center",
-                position: "relative",
+                height: "100%",
+                overflow: "auto",
+                padding: "10px",
               }}
             >
               <div
-                className="row"
                 style={{
-                  textAlign: "center",
-                  alignContent: "center",
-                  justifyContent: "center",
+                  width: "100%",
+                  textAlign: "left",
+                  marginBottom: "1rem",
+                  fontSize: "calc(.6rem + .4vw)",
                 }}
               >
-                <div
-                  className="row d-flex justify-content-left"
-                  style={{ padding: "10px", textAlign: "left" }}
-                >
-                  <h6>{hintText}</h6>
-                </div>
-
-                <div className="col-md-12 d-flex justify-content-left">
-                  <Box sx={{ minWidth: 120 }}>
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">
-                        Tense
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={tense}
-                        label="tense"
-                        onChange={handleChange}
-                      >
-                        {tensejson.map((tense, index) => (
-                          <MenuItem
-                            id={index}
-                            key={index}
-                            value={tense.activity_name}
-                          >
-                            {tense.activity_name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </div>
+                <div>{hintText}</div>
               </div>
-              <hr />
+
+              <Box sx={{ minWidth: 120, width: "100%", marginBottom: "1rem" }}>
+                <FormControl fullWidth>
+                  <InputLabel id="tense-select-label">Tense</InputLabel>
+                  <Select
+                    labelId="tense-select-label"
+                    id="tense-select"
+                    value={tense}
+                    label="Tense"
+                    onChange={handleChange}
+                    sx={{ fontSize: "calc(.6rem + .4vw)" }}
+                  >
+                    {tensejson.map((tenseItem, index) => (
+                      <MenuItem key={index} value={tenseItem.activity_name}>
+                        {tenseItem.activity_name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+
+              <hr style={{ width: "100%" }} />
 
               <div
-                className="row"
                 style={{
-                  height: "50%",
+                  width: "100%",
+                  flexGrow: 1,
                   textAlign: "center",
-                  alignContent: "center",
+                  display: "flex",
+                  flexDirection: "column",
                   justifyContent: "center",
+                  padding: "10px 0",
                 }}
               >
-                <h5 id="sentence-title-1">
+                <div id="sentence-title-1">
                   Sentence in{" "}
-                  {actvityId === 1 ? <>Passive Voice</> : <>Active Voice</>}{" "}
-                </h5>
-                <ul
+                  {actvityId === 1 ? "passive voice" : "active voice"}
+                </div>
+
+                <span
                   id="sortable1"
                   style={{
                     display: "inline-flex",
-                    padding: "10px 10px",
-                    margin: "0",
+                    padding: 0,
+                    margin: 0,
                     justifyContent: "center",
                     listStyle: "none",
-                    textAlign: "center",
-                    alignContent: "center",
                   }}
-                ></ul>
-                <br />
-                <p className="lead"></p>
-                <h5 id="sentence-title-2">
+                ></span>
+
+                <div id="sentence-title-2" style={{ marginTop: "2rem" }}>
                   Sentence in{" "}
-                  {actvityId === 1 ? <>Active Voice</> : <>Passive Voice</>}{" "}
-                </h5>
-                <div style={{ textAlign: "center", alignContent: "center" }}>
+                  {actvityId === 1 ? "active voice" : "passive voice"}
+                </div>
+
+                <div style={{ textAlign: "center", marginTop: "1rem" }}>
                   <ReactSortable
-                    id={"sortable"}
+                    id="sortable"
                     style={{ display: "inline-flex" }}
                     list={actList}
                     setList={setActList}
                   >
                     {actList.map((item, index) => (
-                      <div id={"li" + index} style={draggableItem} key={item}>
+                      <div
+                        id={"li" + index}
+                        style={draggableItem}
+                        key={item + index} // safer unique key
+                      >
                         {item}
                       </div>
                     ))}
                   </ReactSortable>
                 </div>
               </div>
-              <hr />
 
-              <div
-                className="row"
-                style={{
-                  textAlign: "center",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <div
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "space-evenly",
-                    textAlign: "center",
-                    margin: "0",
-                  }}
-                >
-                  {/*<Button
-                    variant="contained"
-                    style={{ backgroundColor: "#01579b", color: "white" }}
-                    onClick={(e) => handleRedirect(e)}
-                    value="Previous"
-                    color="inherit"
-                    sx={{ width: "20%" }}
-                  >
-                    Previous
-                  </Button> */}
-
-                  <Button
-                    variant="outlined"
-                    style={{ backgroundColor: "green", color: "white" }}
-                    onClick={(e) => handleFeedback(e)}
-                    value="Check"
-                    sx={{ width: "20%" }}
-                  >
-                    Check
-                  </Button>
-
-                  <Button
-                    variant="contained"
-                    style={{ backgroundColor: "#01579b", color: "white" }}
-                    onClick={(e) => handleRedirect(e)}
-                    value="Next"
-                    color="inherit"
-                    sx={{ width: "20%" }}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
+              <hr style={{ width: "100%", marginTop: "2rem" }} />
             </div>
           </div>
 
-          {/* ============================================================================== */}
-
-          <div
-            //className="row"
-            style={{
-              height: "100%",
-              marginLeft: "0.1%",
-              marginRight: "0.1%",
-              borderRadius: "13px",
-              boxShadow: "0px 4px 7px #00000029",
-              backgroundColor: "#FFFFFF",
-              width: "30%",
-              textAlign: "center",
-              //justifyContent: "center",
-              overflowX: "hidden",
-              //overflowY: "auto",
-            }}
-          >
-            <>
-              <div
-                className="text-center"
-                style={{
-                  background: "#002F65",
-                  borderRadius: "10px 10px 0px 0px",
-                  opacity: "1",
-                  color: "#FFFFFF",
-                  fontSize: "1.3rem",
-                  fontWeight: "bolder",
+          <div className="row">
+            <div className="d-flex justify-content-around">
+              <Button
+                variant="contained"
+                sx={{
+                  background: "#0F477E",
+                  color: "#ffffff",
+                  fontSize: "calc(.6rem + .4vw)",
                 }}
+                onClick={handleFeedback}
+                value="Check"
               >
-                Instructions
-              </div>
+                {t("check")}
+              </Button>
 
-              <div style={{ textAlign: "left" }}>
-                <div style={{ maxHeight: "50vh", padding: "2%" }}>
-                  <div>
-                    <ul>
-                      <li>Convert Active Voice to Passive Voice</li>
-                      <li>Select the desired tense from the dropdown.</li>
-                      <li>The sentence displayed is in Active voice.</li>
-                      <li>
-                        Corresponding passive voice sentence is given in the
-                        form of disarranged words below.
-                      </li>
-                      <li>
-                        Now, rearrange the given words below to construct the
-                        corresponding Passive voice of the given sentence.
-                      </li>
-                      <li>Click on "Hints" to view hints.</li>
-                      <li>
-                        Click on "Check" to check whether the Passive voice is
-                        properly constructed.
-                      </li>
-                      <li>Click on "Next" to view the next sentence.</li>
-                      <li>
-                        Click on 'Select Level' to attempt 'Level 1' or 'Level
-                        2'.
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </>
+              <Button
+                variant="contained"
+                sx={{
+                  background: "#0F477E",
+                  color: "#ffffff",
+                  fontSize: "calc(.6rem + .4vw)",
+                }}
+                onClick={handleRedirect}
+                value="Next"
+              >
+                {t("next")}
+              </Button>
+            </div>
           </div>
 
-          {/* ============================================================================== */}
           <Dialog
             open={open}
             onClose={handleClose}
@@ -2314,138 +2151,213 @@ const MidLevelActivePassivePage = () => {
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose}>Cancel</Button>
-              <Button onClick={handleClose} autoFocus>
-                Ok
+              <Button
+                size="small"
+                variant="contained"
+                onClick={handleClose}
+                sx={{
+                  background: "#0F477E",
+                  color: "#ffffff",
+                  fontSize: "calc(.6rem + .4vw)",
+                }}
+              >
+                {t("cancel")}
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={handleClose}
+                sx={{
+                  background: "#0F477E",
+                  color: "#ffffff",
+                  fontSize: "calc(.6rem + .4vw)",
+                }}
+              >
+                {t("ok")}
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog
+            fullScreen={fullScreen}
+            open={openFeedback}
+            onClose={handleCloseResult}
+            maxWidth={"lg"}
+            aria-labelledby="responsive-dialog-title"
+          >
+            <DialogTitle
+              id="responsive-dialog-title"
+              style={{ textAlign: "center" }}
+            >
+              <b> {t("result")} </b>
+            </DialogTitle>
+            <DialogContent>
+              {fdbackObj["result"] === "Correct answer" ? (
+                <div>
+                  <span style={{ color: "#098B0D" }}>Congratulations!</span>{" "}
+                  Your answer is correct.
+                </div>
+              ) : (
+                <Table
+                  className="text-center"
+                  bordered
+                  style={{ border: "1px solid black" }}
+                >
+                  <thead style={{ background: "#0F477E", color: "#ffffff" }}>
+                    <tr>
+                      <th colSpan="4" style={{ padding: "10px" }}>
+                        {" "}
+                        <b> {t("feedback")} </b>{" "}
+                      </th>
+                    </tr>
+                    <tr>
+                      <th
+                        style={{ padding: "10px", border: "1px solid black" }}
+                      >
+                        Item
+                      </th>
+                      <th
+                        style={{ padding: "10px", border: "1px solid black" }}
+                      >
+                        Result
+                      </th>
+                      <th
+                        style={{ padding: "10px", border: "1px solid black" }}
+                      >
+                        Desctiption
+                      </th>
+                      <th
+                        style={{ padding: "10px", border: "1px solid black" }}
+                      >
+                        Remedy
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody style={{ background: "#EDF6FA", color: "#000" }}>
+                    {Object.keys(fdbackObj).map((method, index) => (
+                      <>
+                        {method === "subject" ||
+                        method === "object" ||
+                        method === "main_verb" ||
+                        method === "helping_verb" ||
+                        method === "by" ? (
+                          <tr key={index} style={{ border: "1px solid black" }}>
+                            <td
+                              style={{
+                                padding: "10px",
+                                border: "1px solid black",
+                              }}
+                              key={method + "0"}
+                            >
+                              {method.toUpperCase()}
+                            </td>
+                            <td
+                              style={{
+                                textAlign: "center",
+                                padding: "5px",
+                                border: "1px solid black",
+                              }}
+                              key={method + "1"}
+                            >
+                              {" "}
+                              <CloseOutlinedIcon style={{ color: "red" }} />
+                            </td>
+                            <td
+                              style={{
+                                padding: "10px",
+                                border: "1px solid black",
+                              }}
+                              key={method + "2"}
+                            >
+                              {fdbackObj[method][0]}
+                            </td>
+                            <td
+                              style={{
+                                padding: "10px",
+                                border: "1px solid black",
+                              }}
+                              key={method + "3"}
+                            >
+                              {fdbackObj[method][1]}
+                            </td>
+                          </tr>
+                        ) : (
+                          <tr key={index} style={{ display: "none" }}></tr>
+                        )}
+                      </>
+                    ))}
+                  </tbody>
+                </Table>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={handleCloseResult}
+                sx={{
+                  background: "#0F477E",
+                  color: "#ffffff",
+                  fontSize: "calc(.6rem + .4vw)",
+                }}
+              >
+                {t("ok")}
               </Button>
             </DialogActions>
           </Dialog>
         </div>
+      </div>
 
-        {/* =======================================           ========================== */}
-
-        {/* ================================= Feedback Dialogue ================================ */}
-
-        <Dialog
-          fullScreen={fullScreen}
-          open={openFeedback}
-          onClose={handleCloseResult}
-          maxWidth={"lg"}
-          aria-labelledby="responsive-dialog-title"
+      <div className="col-sm-3 d-flex align-items-center justify-content-center">
+        <div
+          style={{
+            height: "80vh",
+            width: "95%",
+            overflow: "auto",
+            overflowX: "hidden",
+            borderRadius: "13px",
+            boxShadow: "0px 4px 7px #00000029",
+            display: "block",
+            background: "#FFFFFF 0% 0% no-repeat padding-box",
+            margin: "5px",
+          }}
         >
-          <DialogTitle
-            id="responsive-dialog-title"
-            style={{ textAlign: "center" }}
+          <div
+            className="sticky-top text-center subheading"
+            style={{
+              background: "#002F65",
+              borderRadius: "13px 13px 0px 0px",
+              opacity: "1",
+              color: "#FFFFFF",
+              fontSize: "calc(1rem + 0.2vw)",
+              fontWeight: "bolder",
+            }}
           >
-            <b> RESULT </b>
-          </DialogTitle>
-          <DialogContent>
-            {fdbackObj["result"] === "Correct answer" ? (
-              <b style={{ color: "green" }}>
-                Congratulations! Your answer is correct.
-              </b>
-            ) : (
-              <table
-                style={{
-                  width: "100%",
-                  tableLayout: "auto",
-                  border: "1px solid black",
-                }}
-              >
-                <thead style={{ padding: "10px", border: "1px solid black" }}>
-                  <tr
-                    style={{
-                      border: "1px solid black",
-                      textAlign: "center",
-                      color: "white",
-                      background: "blue",
-                    }}
-                  >
-                    <th colSpan="4" style={{ padding: "10px" }}>
-                      {" "}
-                      <b> Feedback </b>{" "}
-                    </th>
-                  </tr>
-                  <tr>
-                    <th style={{ padding: "10px", border: "1px solid black" }}>
-                      Item
-                    </th>
-                    <th style={{ padding: "10px", border: "1px solid black" }}>
-                      Result
-                    </th>
-                    <th style={{ padding: "10px", border: "1px solid black" }}>
-                      Desctiption
-                    </th>
-                    <th style={{ padding: "10px", border: "1px solid black" }}>
-                      Remedy
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.keys(fdbackObj).map((method, index) => (
-                    <>
-                      {method === "subject" ||
-                      method === "object" ||
-                      method === "main_verb" ||
-                      method === "helping_verb" ||
-                      method === "by" ? (
-                        <tr key={index} style={{ border: "1px solid black" }}>
-                          <td
-                            style={{
-                              padding: "10px",
-                              border: "1px solid black",
-                            }}
-                            key={method + "0"}
-                          >
-                            {method.toUpperCase()}
-                          </td>
-                          <td
-                            style={{
-                              textAlign: "center",
-                              padding: "5px",
-                              border: "1px solid black",
-                            }}
-                            key={method + "1"}
-                          >
-                            {" "}
-                            <CloseOutlinedIcon style={{ color: "red" }} />
-                          </td>
-                          <td
-                            style={{
-                              padding: "10px",
-                              border: "1px solid black",
-                            }}
-                            key={method + "2"}
-                          >
-                            {fdbackObj[method][0]}
-                          </td>
-                          <td
-                            style={{
-                              padding: "10px",
-                              border: "1px solid black",
-                            }}
-                            key={method + "3"}
-                          >
-                            {fdbackObj[method][1]}
-                          </td>
-                        </tr>
-                      ) : (
-                        <tr key={index} style={{ display: "none" }}></tr>
-                      )}
-                    </>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseResult} autoFocus>
-              {" "}
-              OK{" "}
-            </Button>
-          </DialogActions>
-        </Dialog>
-        {/* ================================= Feedback Dialogue ================================ */}
+            {t("instr")}
+          </div>
+          <div
+            style={{
+              maxHeight: "50vh",
+              padding: "2%",
+              lineHeight: "30px",
+              fontSize: "calc(.6rem + .4vw)",
+            }}
+          >
+            <div>
+              <ul>
+                <li>{t("instr1")}</li>
+                <li>{t("instr2")}</li>
+                <li>{t("instr3")}</li>
+                <li>{t("instr4")}</li>
+                <li>{t("instr5")}</li>
+                <li>{t("instr6")}</li>
+                <li>{t("instr7")}</li>
+                <li>{t("instr8")}</li>
+                <li>{t("instr9")}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
