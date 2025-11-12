@@ -40,7 +40,8 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 
 import tensejson from "../supportingfiles/DBJSON/tense.json";
-import sentenceTemplate from "../supportingfiles/DBJSON/sentence_template.json";
+// import sentenceTemplate from "../supportingfiles/DBJSON/sentence_template.json";
+import sentenceTemplate from "./sentenceTemplate";
 import "../resources/Midcontent.css";
 import verbjson from "../supportingfiles/DBJSON/verb.json";
 import nounverbjson from "../supportingfiles/DBJSON/noun_verb.json";
@@ -59,9 +60,7 @@ const MidLevelActivePassivePage = () => {
   const [hintTitle, setHintTitle] = useState("Instructions");
   const [tense, setTense] = React.useState("Simple Present Tense");
   const [sentTempPath, setSentTempPath] = useState("");
-  const [actvityId, setActivityId] = useState(
-    parseInt(location.state.activityId)
-  );
+  const [actvityId, setActivityId] = useState(3);
   const [passActObj, setPassActObj] = useState({});
   const [actList, setActList] = useState([]);
   const [openFeedback, setOpenFeedback] = useState(false);
@@ -212,14 +211,14 @@ const MidLevelActivePassivePage = () => {
 
   async function simpleSentenceParser(xmlFileSrc) {
     try {
-      const path = "../supportingfiles" + xmlFileSrc;
-      const staticPath = require(`../supportingfiles${xmlFileSrc}`);
+      // const path = "../supportingfiles" + xmlFileSrc;
+      // const staticPath = require(`../supportingfiles${xmlFileSrc}`);
 
-      const response = await fetch(staticPath);
-      const textResponse = await response.text();
+      // const response = await fetch(staticPath);
+      // const textResponse = await response.text();
 
       const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(textResponse, "text/xml");
+      const xmlDoc = parser.parseFromString(sentenceTemplate, "text/xml");
       const listSentence = xmlDoc.querySelectorAll("sentence");
 
       const randSentId = randomNumberInRange(0, listSentence.length - 1);
@@ -1455,8 +1454,10 @@ const MidLevelActivePassivePage = () => {
 
     if (exercise_id === 3) {
       jsonObject["active_voice_array"] = tempActivityPojo.active_sentence;
-      jsonObject["jumbled_passive_sentence_array"] =
-        tempActivityPojo.jumbled_passive_sentence;
+      let newArrayEle = tempActivityPojo.jumbled_passive_sentence.map((item) =>
+        item.toLowerCase()
+      );
+      jsonObject["jumbled_passive_sentence_array"] = newArrayEle;
       setActList(jsonObject["jumbled_passive_sentence_array"]);
     }
 
@@ -1963,17 +1964,15 @@ const MidLevelActivePassivePage = () => {
             fontSize: "calc(.6rem + .4vw)",
           }}
         >
-          <div className="row align-items-center mb-5 mt-2">
-            <div className="col-12 col-md-6 d-flex justify-content-end mb-2 mb-md-0">
-              <div
-                className="fw-bolder"
-                style={{ fontSize: "calc(1rem + .4vw)" }}
-              >
-                Active to passive
-              </div>
+          <div className="row align-items-center text-center mb-5 mt-2">
+            <div
+              className="fw-bolder"
+              style={{ fontSize: "calc(1rem + .4vw)" }}
+            >
+              Active to passive
             </div>
 
-            <div className="col-12 col-md-6 d-flex justify-content-md-end justify-content-center">
+            {/* <div className="col-12 col-md-6 d-flex justify-content-md-end justify-content-center">
               <FormControl size="small" sx={{ minWidth: 120 }}>
                 <Select
                   labelId="demo-simple-select-label"
@@ -1995,7 +1994,7 @@ const MidLevelActivePassivePage = () => {
                   <MenuItem value="Level 2">{t("level2")}</MenuItem>
                 </Select>
               </FormControl>
-            </div>
+            </div> */}
           </div>
 
           <div style={{ width: "100%", height: "auto" }}>
@@ -2022,7 +2021,14 @@ const MidLevelActivePassivePage = () => {
                 <div>{hintText}</div>
               </div>
 
-              <Box sx={{ minWidth: 120, width: "100%", marginBottom: "1rem" }}>
+              <Box
+                sx={{
+                  minWidth: 120,
+                  width: "100%",
+                  marginBottom: "1rem",
+                  background: "#F5B946",
+                }}
+              >
                 <FormControl fullWidth>
                   <InputLabel id="tense-select-label">Tense</InputLabel>
                   <Select
@@ -2087,12 +2093,24 @@ const MidLevelActivePassivePage = () => {
                       <div
                         id={"li" + index}
                         style={draggableItem}
-                        key={item + index} // safer unique key
+                        key={item + index}
                       >
-                        {item}
+                        {index === 0
+                          ? item.charAt(0).toUpperCase() + item.slice(1)
+                          : item}
                       </div>
                     ))}
                   </ReactSortable>
+                  <span
+                    id="sortable"
+                    style={{
+                      ...draggableItem,
+                      display: "inline-flex",
+                      marginLeft: "4px",
+                    }}
+                  >
+                    .
+                  </span>
                 </div>
               </div>
 
@@ -2112,7 +2130,7 @@ const MidLevelActivePassivePage = () => {
                 onClick={handleFeedback}
                 value="Check"
               >
-                {t("check")}
+                {t("verify")}
               </Button>
 
               <Button
@@ -2194,8 +2212,8 @@ const MidLevelActivePassivePage = () => {
             <DialogContent>
               {fdbackObj["result"] === "Correct answer" ? (
                 <div>
-                  <span style={{ color: "#098B0D" }}>Congratulations!</span>{" "}
-                  Your answer is correct.
+                  <span style={{ color: "#098B0D" }}>Correct!</span> Your answer
+                  is correct.
                 </div>
               ) : (
                 <Table
@@ -2249,7 +2267,7 @@ const MidLevelActivePassivePage = () => {
                               }}
                               key={method + "0"}
                             >
-                              {method.toUpperCase()}
+                              {method.charAt(0).toUpperCase() + method.slice(1)}
                             </td>
                             <td
                               style={{
@@ -2290,7 +2308,7 @@ const MidLevelActivePassivePage = () => {
                 </Table>
               )}
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{ justifyContent: "center" }}>
               <Button
                 size="small"
                 variant="contained"
@@ -2353,7 +2371,6 @@ const MidLevelActivePassivePage = () => {
                 <li>{t("instr6")}</li>
                 <li>{t("instr7")}</li>
                 <li>{t("instr8")}</li>
-                <li>{t("instr9")}</li>
               </ul>
             </div>
           </div>

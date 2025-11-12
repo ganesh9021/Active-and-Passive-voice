@@ -41,7 +41,8 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 
 import tensejson from "../supportingfiles/DBJSON/tense.json";
-import sentenceTemplate from "../supportingfiles/DBJSON/sentence_template.json";
+// import sentenceTemplate from "../supportingfiles/DBJSON/sentence_template.json";
+import sentenceTemplate from "./sentenceTemplate";
 import "../resources/Midcontent.css";
 import verbjson from "../supportingfiles/DBJSON/verb.json";
 import nounverbjson from "../supportingfiles/DBJSON/noun_verb.json";
@@ -211,16 +212,16 @@ const MidLevelPassiveActivePage = () => {
   }, [actvityId]);
 
   async function simpleSentenceParser(xmlFileSrc) {
-    const path = "../supportingfiles" + xmlFileSrc;
-    const staticPath = require(`../supportingfiles${xmlFileSrc}`);
-    console.log(staticPath);
+    // const path = "../supportingfiles" + xmlFileSrc;
+    // const staticPath = require(`../supportingfiles${xmlFileSrc}`);
+    // console.log(staticPath);
 
     try {
-      const response = await fetch(staticPath);
-      const textResponse = await response.text();
+      // const response = await fetch(staticPath);
+      // const textResponse = await response.text();
 
       const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(textResponse, "text/xml");
+      const xmlDoc = parser.parseFromString(sentenceTemplate, "text/xml");
 
       const listSentence = xmlDoc.querySelectorAll("sentence");
       const randSentId = randomNumberInRange(0, listSentence.length - 1);
