@@ -15,6 +15,7 @@
   "instr5": "Click on \"HINTS\" to view hints.",
   "instr6": "Click on \"VERIFY\" to check the passive voice sentence.",
   "instr7": "Click on \"NEXT\" to view the next sentence.",
+  "instruction_restart": "Click on the \"RESTART\" button to try the level again.",
 
   "hint1": "In passive voice, the positions of Subject and Object are interchanged.",
   "hint2": "In passive voice, Past Participle (3rd form of Verb) is always used as Main verb.",
