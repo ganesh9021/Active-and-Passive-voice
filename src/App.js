@@ -1,5 +1,3 @@
-import "./App.css";
-import "animate.css";
 import { Routes, Route, useParams } from "react-router-dom";
 import Homepage from "./components/Homepage";
 import Mainpage from "./components/Mainpage";
@@ -17,7 +15,7 @@ import { v4 as uuid } from "uuid";
 import logconfig from "./config/dbconfig";
 import { useDispatch } from "react-redux";
 import ReactGA from "react-ga4";
-import Language from "./Language";
+import Language from "./language/Language";
 import setLangStore, { changeLang } from "./store/Store";
 import RestartPage from "./components/RestartPage";
 
@@ -27,6 +25,7 @@ function App() {
   let dispatch = useDispatch();
   const sid = uuid();
   const { t, i18n } = useTranslation();
+  const [currentQuesJson, setCurrentQuesJson] = useState(null);
 
   useEffect(() => {
     localStorage.setItem("sessionid", sid);
@@ -65,83 +64,73 @@ function App() {
     });
   }, []);
 
-  // useEffect(() => {
-  //   if (id == "en") {
-  //     alert("in app en : ", id);
-  //     i18n.changeLanguage("en");
-  //     dispatch(changeLang("en"));
-  //   }
-  //   if (id == "hn") {
-  //     alert("in app hn : ", id);
-  //     i18n.changeLanguage("hn");
-  //     dispatch(changeLang("hn"));
-  //   }
-  // }, []);
-
   useEffect(() => {
-    let langParam = null;
-    const params = new URLSearchParams(window.location.search);
-    langParam = params.get("elink_lan");
+    let langParam = new URLSearchParams(window.location.search).get(
+      "elink_lan"
+    );
     if (!langParam && window.frameElement) {
       try {
-        const iframeSrc = window.frameElement.getAttribute("src");
-        console.log("iframe src found:" + iframeSrc);
-
-        if (iframeSrc && iframeSrc.includes("elink_lan")) {
-          const match = iframeSrc.match(/[?&]elink_lan=([^&#]*)/);
-
-          if (match && match[1]) {
-            langParam = decodeURIComponent(match[1]);
-          }
+        const src = window.frameElement.getAttribute("src");
+        const match = src?.match(/[?&]elink_lan=([^&#]+)/);
+        if (match?.[1]) {
+          langParam = decodeURIComponent(match[1]);
         }
-      } catch (error) {
-        console.warn("unable to read iframe src: " + error);
+      } catch (err) {
+        console.warn("Unable to read iframe src:", err);
       }
     }
-
-    console.log("Detected language param: " + langParam);
     const shortLang = langParam ? langParam.split("-")[0] : "en";
-    const supportedLangs = ["en", "hi"];
-    const langToUse = supportedLangs.includes(shortLang) ? shortLang : "en";
-    i18n.changeLanguage(langToUse);
-    dispatch(changeLang(langToUse));
+    i18n.changeLanguage(shortLang);
+    dispatch(changeLang(shortLang));
+    import(`./quizquestions/questions_${shortLang}.json`)
+      .then((module) => {
+        setCurrentQuesJson(module.default);
+      })
+      .catch(() => {
+        console.warn("Language file not found, falling back to EN");
+        import("./quizquestions/questions_en.json").then((module) => {
+          setCurrentQuesJson(module.default);
+        });
+      });
   }, [i18n, dispatch]);
 
   return (
     <Routes>
-      <Route path="/:id" element={<App />} />
       <Route path="/elink_lan=:langToUse" element={<App />} />
       <Route exact path="/" element={<Homepage />}></Route>
       <Route exact path="/theory" element={<TheoryPage />}></Route>
       <Route exact path="/animation" element={<AnimationPage />}></Route>
-      <Route exact path="/quiz" element={<MathsQuiz />}></Route>
+      <Route
+        path="/quiz"
+        element={
+          currentQuesJson ? (
+            <MathsQuiz currentQuesJson={currentQuesJson} />
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+              }}
+            >
+              Loading quiz...
+            </div>
+          )
+        }
+      />
       <Route exact path="/procedure" element={<Procedure />}></Route>
-      <Route exact path="/letusverify" element={<Homepage />}></Route>
-      {/* <Route
-        exact
-        path="/launchpage/englishactivity"
-        element={<Mainpage />}
-      ></Route> */}
+      <Route exact path="/letusverify" element={<Homepage />}></Route>\
       <Route
         exact
         path="/launchpage/englishactivity"
         element={<MidLevelActivePassive />}
       ></Route>
-       <Route
+      <Route
         exact
         path="/launchpage/englishactivity/restart"
         element={<RestartPage />}
       ></Route>
-      {/* <Route
-        exact
-        path="/launchpage/active-passive"
-        element={<MidLevelActivePassive />}
-      ></Route> */}
-      {/* <Route
-        exact
-        path="/launchpage/passive-active"
-        element={<MidLevelPassiveActive />}
-      ></Route> */}
     </Routes>
   );
 }

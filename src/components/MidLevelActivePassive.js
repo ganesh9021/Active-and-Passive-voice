@@ -23,13 +23,14 @@ const MidLevelActivePassive = () => {
         RSM_animation_tt={t("animation")}
         RSM_theory_tt={t("theory")}
         RSM_vivavoce_tt={t("vivavoce")}
+        RSM_Menu_tt={t("menu")}	
         RSM_ok={t("ok")}
         M_midcontent_comp={<MidLevelActivePassivePage />}
         RSM_Intruc_popup_title_string={t("ifq")}
         RSM_QuizPopupContent_comp={<QuizPopupContent />}
         WS_sendJsonMessage={sendJsonMessage}
         WS_SendLogData={SendLogData}
-        labNo="-"
+        labNo="6"
         labShortName={t("title")}
       />
     </>

@@ -2,11 +2,8 @@ import React from "react";
 import TableRulesPassAct from "./TableRulesPassAct";
 import TableRulesPronPassAct from "./TableRulesPronPassAct";
 import TableRulesPronNounNum from "./TableRulesPronNounNum";
-import "../resources/TheoryMidcontent.css";
-import { useTranslation } from "react-i18next";
 
 const TheoryMidContent = () => {
-  const { t } = useTranslation();
   return (
     <div
       className="py-3"
@@ -17,8 +14,10 @@ const TheoryMidContent = () => {
         fontSize: "calc(.6rem + .4vw)",
       }}
     >
-      <div className="fw-bolder">{t("obj")}</div>
-      <p className="ms-3">{t("objective")} </p>
+      <div className="fw-bolder">Objective</div>
+      <p className="ms-3">
+        To learn conversion of sentence from active voice to passive voice.
+      </p>
 
       <div className="fw-bolder">What is voice?</div>
       <p className="ms-3">
@@ -203,7 +202,7 @@ const TheoryMidContent = () => {
       {/************************ First Table ******************/}
       <div className="fw-bolder">
         <strong>
-          <span> Table 1: Rules for passive to active conversion</span>
+          <span> Table 1: Rules for active to passive voice conversion</span>
         </strong>
       </div>
       <TableRulesPassAct />
@@ -213,7 +212,7 @@ const TheoryMidContent = () => {
         <strong>
           <span>
             {" "}
-            Table 2: Rules for pronouns in passive to active conversion
+            Table 2: Rules for pronouns in passive to active voice conversion
           </span>
         </strong>
       </div>

@@ -42,7 +42,6 @@ import Paper from "@mui/material/Paper";
 import tensejson from "../supportingfiles/DBJSON/tense.json";
 // import sentenceTemplate from "../supportingfiles/DBJSON/sentence_template.json";
 import sentenceTemplate from "./sentenceTemplate";
-import "../resources/Midcontent.css";
 import verbjson from "../supportingfiles/DBJSON/verb.json";
 import nounverbjson from "../supportingfiles/DBJSON/noun_verb.json";
 import nounjson from "../supportingfiles/DBJSON/noun.json";
@@ -2155,7 +2154,7 @@ const MidLevelActivePassivePage = () => {
                     state: { attempted: sentCount, type: "sentences" },
                   })
                 }
-                value="Next"
+                value="finish"
               >
                 {t("finish")}
               </Button>

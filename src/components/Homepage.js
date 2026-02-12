@@ -27,7 +27,7 @@ const Homepage = () => {
         cancel={t("cancel")}
         WS_sendJsonMessage={sendJsonMessage}
         WS_SendLogData={SendLogData}
-        labNo="-"
+        labNo="6"
         labShortName={t("title")}
         L_Developby={t("Developed_by")}
         L_CDACMum={t("C_DAC_Mumbai")}

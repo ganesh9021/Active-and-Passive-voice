@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate, useNavigation } from "react-router-dom";
 import level1Img from "../Img/levelImg/Level1.png";
 import level2Img from "../Img/levelImg/Level2.png";
-import "../resources/Midcontent.css";
 import { Card } from "react-bootstrap";
 import { Button } from "@mui/material";
 import { useTranslation } from "react-i18next";

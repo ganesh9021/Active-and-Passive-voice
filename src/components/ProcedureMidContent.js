@@ -38,7 +38,7 @@ const ProcedureMidContent = () => {
                 padding: "4px 0",
               }}
             >
-              Fig. 1: Select tense
+              {t("proc_image_1")}
             </div>
           </div>
         </div>
@@ -61,7 +61,7 @@ const ProcedureMidContent = () => {
                 padding: "4px 0",
               }}
             >
-              Fig. 2: Sentence in Active voice
+              {t("proc_image_2")}
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@ const ProcedureMidContent = () => {
                 padding: "4px 0",
               }}
             >
-              Fig. 3: Shuffeled words of sentence in passive voice
+              {t("proc_image_3")}
             </div>
           </div>
         </div>
@@ -108,7 +108,7 @@ const ProcedureMidContent = () => {
                 padding: "4px 0",
               }}
             >
-              Fig. 4: Feedback of constructed passive voice sentence
+              {t("proc_image_4")}
             </div>
           </div>
         </div>
